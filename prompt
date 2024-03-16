@@ -1,0 +1,51 @@
+import openai
+import os
+import sys
+import argparse
+
+# Set up OpenAI API key
+openai.api_key = "YOUR_API_KEY"
+
+def generate_code(prompt):
+    response = openai.Completion.create(
+        engine="text-davinci-002",
+        prompt=prompt,
+        max_tokens=100,
+        n=1,
+        stop=None,
+        temperature=0.7,
+    )
+    return response.choices[0].text.strip()
+
+def create_project_structure(project_name):
+    os.makedirs(project_name)
+    os.makedirs(os.path.join(project_name, "src"))
+    os.makedirs(os.path.join(project_name, "public"))
+    with open(os.path.join(project_name, "index.html"), "w") as file:
+        file.write("<!DOCTYPE html>\n<html lang='en'>\n<head>\n    <meta charset='UTF-8'>\n    <title>My App</title>\n</head>\n<body>\n    <div id='root'></div>\n</body>\n</html>")
+
+def main():
+    parser = argparse.ArgumentParser(description="AI-powered web application development tool")
+    parser.add_argument("command", help="The command to execute (e.g., generate, create)")
+    parser.add_argument("--prompt", help="The prompt for code generation")
+    parser.add_argument("--project", help="The name of the project to create")
+    args = parser.parse_args()
+
+    if args.command == "generate":
+        if args.prompt:
+            generated_code = generate_code(args.prompt)
+            print("Generated code:")
+            print(generated_code)
+        else:
+            print("Please provide a prompt for code generation using the --prompt argument.")
+    elif args.command == "create":
+        if args.project:
+            create_project_structure(args.project)
+            print(f"Project '{args.project}' created successfully.")
+        else:
+            print("Please provide a project name using the --project argument.")
+    else:
+        print("Invalid command. Available commands: generate, create")
+
+if __name__ == "__main__":
+    main()
